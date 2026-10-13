@@ -11,6 +11,17 @@ namespace BackgammonOnline.Web.Data
         {
         }
 
+        //DbSet
         public DbSet<GameRoom> GameRooms { get; set; }
+        public DbSet<GameRoomMember> GameRoomMembers { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<GameRoomMember>()
+                .HasIndex(m => new { m.GameRoomId, m.UserId })
+                .IsUnique();
+        }
     }
 }

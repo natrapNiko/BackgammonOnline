@@ -20,5 +20,6 @@ namespace BackgammonOnline.Web.Models.Entities
         public string? PasswordHash { get; set; }
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public ICollection<GameRoomMember> Members { get; set; } = new List<GameRoomMember>(); 
     }
 }
