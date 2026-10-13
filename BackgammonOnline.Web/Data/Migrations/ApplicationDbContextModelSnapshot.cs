@@ -38,7 +38,8 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
@@ -46,6 +47,12 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Variant")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
