@@ -11,6 +11,8 @@ namespace BackgammonOnline.Web.Models.Entities
         public int? GameRoomId { get; set; }
         public GameVariant Variant { get; set; }
         public GameStatus Status { get; set; }
+        public GameMode Mode { get; set; } = GameMode.Solo;
+        public AiDifficulty? Difficulty { get; set; }
         [Required]
         public string PlayerOneId { get; set; } = string.Empty;
         public string? PlayerTwoId { get; set; }

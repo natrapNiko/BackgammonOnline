@@ -33,10 +33,16 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("Difficulty")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("FinishedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Mode")
                         .HasColumnType("int");
 
                     b.Property<string>("PlayerOneId")
