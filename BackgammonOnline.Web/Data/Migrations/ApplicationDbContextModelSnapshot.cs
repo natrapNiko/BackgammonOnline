@@ -22,6 +22,55 @@ namespace BackgammonOnline.Web.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FinishedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlayerOneId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PlayerTwoId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("StartedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Variant")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WinnerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameRoomId");
+
+                    b.HasIndex("PlayerOneId");
+
+                    b.HasIndex("PlayerTwoId");
+
+                    b.HasIndex("WinnerId");
+
+                    b.ToTable("Games");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
                     b.Property<int>("Id")
@@ -290,6 +339,38 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
+                {
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
+                        .WithMany()
+                        .HasForeignKey("GameRoomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "PlayerOne")
+                        .WithMany()
+                        .HasForeignKey("PlayerOneId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "PlayerTwo")
+                        .WithMany()
+                        .HasForeignKey("PlayerTwoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Winner")
+                        .WithMany()
+                        .HasForeignKey("WinnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GameRoom");
+
+                    b.Navigation("PlayerOne");
+
+                    b.Navigation("PlayerTwo");
+
+                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>

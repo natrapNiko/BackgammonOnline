@@ -14,6 +14,7 @@ namespace BackgammonOnline.Web.Data
         //DbSet
         public DbSet<GameRoom> GameRooms { get; set; }
         public DbSet<GameRoomMember> GameRoomMembers { get; set; }
+        public DbSet<Game> Games { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -37,6 +38,34 @@ namespace BackgammonOnline.Web.Data
             builder.Entity<GameRoomMember>()
                 .HasIndex(m => new { m.GameRoomId, m.UserId })
                 .IsUnique();
+
+            //A Game can optionally belong to a room
+            builder.Entity<Game>()
+                .HasOne(g => g.GameRoom)
+                .WithMany()
+                .HasForeignKey(g => g.GameRoomId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //First player
+            builder.Entity<Game>()
+                .HasOne(g => g.PlayerOne)
+                .WithMany()
+                .HasForeignKey(g => g.PlayerOneId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Second player
+            builder.Entity<Game>()
+                .HasOne(g => g.PlayerTwo)
+                .WithMany()
+                .HasForeignKey(g => g.PlayerTwoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //WInner
+            builder.Entity<Game>()
+                .HasOne(g => g.Winner)
+                .WithMany()
+                .HasForeignKey(g => g.WinnerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
