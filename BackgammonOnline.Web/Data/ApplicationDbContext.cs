@@ -20,6 +20,8 @@ namespace BackgammonOnline.Web.Data
         public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
         public DbSet<GameRoomInvitation> GameRoomInvitations { get; set; } = null!;
         public DbSet<GameRoomBan> GameRoomBans { get; set; } = null!;
+        public DbSet<PlayerStatistic> PlayerStatistics { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -166,7 +168,7 @@ namespace BackgammonOnline.Web.Data
 
             //Each bann records the registered user who issued it
             builder.Entity<GameRoomBan>()
-                .HasOne(b => b.BannedUser)
+                .HasOne(b => b.BannedByUser)
                 .WithMany()
                 .HasForeignKey(b => b.BannedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -174,6 +176,18 @@ namespace BackgammonOnline.Web.Data
             //Prevent duplicate bans for the same user in the same room
             builder.Entity<GameRoomBan>()
                 .HasIndex(b => new { b.GameRoomId, b.BannedUserId })
+                .IsUnique();
+
+            //One registered user can have statistics for each game variant
+            builder.Entity<PlayerStatistic>()
+                .HasOne(s => s.User)
+                .WithMany()
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Prevent duplicate statistics for the same user and variant
+            builder.Entity<PlayerStatistic>()
+                .HasIndex(s => new { s.UserId, s.Variant })
                 .IsUnique();
         }
     }

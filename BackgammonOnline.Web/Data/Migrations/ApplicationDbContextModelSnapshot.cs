@@ -203,10 +203,6 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("BannedByUserId1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("BannedUserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -222,7 +218,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("BannedByUserId");
 
-                    b.HasIndex("BannedByUserId1");
+                    b.HasIndex("BannedUserId");
 
                     b.HasIndex("GameRoomId", "BannedUserId")
                         .IsUnique();
@@ -338,6 +334,44 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("GameTurns");
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.PlayerStatistic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GamesAbandoned")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GamesLost")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GamesPlayed")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GamesWon")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Variant")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Variant")
+                        .IsUnique();
+
+                    b.ToTable("PlayerStatistics");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -614,16 +648,16 @@ namespace BackgammonOnline.Web.Data.Migrations
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomBan", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedByUser")
                         .WithMany()
                         .HasForeignKey("BannedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedByUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedUser")
                         .WithMany()
-                        .HasForeignKey("BannedByUserId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("BannedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
@@ -694,6 +728,17 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.PlayerStatistic", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
