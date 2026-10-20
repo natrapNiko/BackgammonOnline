@@ -51,7 +51,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("GameRoomId", "SendAtUtc");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("ChatMessages", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
@@ -106,7 +106,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameMove", b =>
@@ -148,7 +148,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameId", "TurnNumber", "MoveNumber")
                         .IsUnique();
 
-                    b.ToTable("GameMoves");
+                    b.ToTable("GameMoves", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
@@ -185,7 +185,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GameRooms");
+                    b.ToTable("GameRooms", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomInvitation", b =>
@@ -227,7 +227,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("RecipientId", "Status");
 
-                    b.ToTable("GameRoomInvitations");
+                    b.ToTable("GameRoomInvitations", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
@@ -258,7 +258,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameRoomId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("GameRoomMembers");
+                    b.ToTable("GameRoomMembers", (string)null);
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>
@@ -295,7 +295,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameId", "TurnNumber")
                         .IsUnique();
 
-                    b.ToTable("GameTurns");
+                    b.ToTable("GameTurns", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

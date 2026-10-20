@@ -13,13 +13,10 @@ namespace BackgammonOnline.Web.Models.Entities
         public string Name { get; set; } = string.Empty;
         [Required]
         public string OwnerId { get; set; } = string.Empty;
+        public bool IsPrivate { get; set; } = false;
+        public string? PasswordHash { get; set; }
         public GameVariant Variant { get; set; } = GameVariant.Portes;
         public RoomStatus Status { get; set; } = RoomStatus.Waiting;
-
-        public bool IsPrivate { get; set; }
-
-        public string? PasswordHash { get; set; }
-
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public ICollection<GameRoomMember> Members { get; set; } = new List<GameRoomMember>();
         public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
