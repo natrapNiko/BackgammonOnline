@@ -182,6 +182,43 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.ToTable("GameRoomMembers");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DieOne")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DieTwo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlayerId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TurnNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId", "TurnNumber")
+                        .IsUnique();
+
+                    b.ToTable("GameTurns");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -446,6 +483,17 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>
+                {
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.Game", "Game")
+                        .WithMany("Turns")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -500,6 +548,8 @@ namespace BackgammonOnline.Web.Data.Migrations
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
                 {
                     b.Navigation("Moves");
+
+                    b.Navigation("Turns");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>

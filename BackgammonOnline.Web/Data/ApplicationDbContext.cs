@@ -16,6 +16,7 @@ namespace BackgammonOnline.Web.Data
         public DbSet<GameRoomMember> GameRoomMembers { get; set; }
         public DbSet<Game> Games { get; set; } = null!;
         public DbSet<GameMove> GameMoves { get; set; } = null!;
+        public DbSet<GameTurn> GameTurns { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -83,7 +84,18 @@ namespace BackgammonOnline.Web.Data
                     m.MoveNumber
                 })
                 .IsUnique();
-                
+
+            //One Game can contain many turns
+            builder.Entity<GameTurn>()
+                .HasOne(t => t.Game)
+                .WithMany(g => g.Turns)
+                .HasForeignKey(t => t.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            builder.Entity<GameTurn>()
+                .HasIndex(t => new { t.GameId, t.TurnNumber })
+                .IsUnique();
         }
     }
 }
