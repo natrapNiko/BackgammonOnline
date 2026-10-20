@@ -14,5 +14,6 @@ namespace BackgammonOnline.Web.Models.Entities
         public DateTime StartedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? CompletedAtUtc { get; set; }
         public Game Game { get; set; } = null!;
+        public ICollection<GameMove> Moves { get; set; } = new List<GameMove>();
     }
 }

@@ -75,6 +75,13 @@ namespace BackgammonOnline.Web.Data
                 .HasForeignKey(m => m.GameId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            //One turn can contain many moves.
+            builder.Entity<GameMove>()
+                .HasOne(m => m.GameTurn)
+                .WithMany(t => t.Moves)
+                .HasForeignKey(m => m.GameTurnId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             //Prevent duplicate move numbers within the same turn
             builder.Entity<GameMove>()
                 .HasIndex(m => new

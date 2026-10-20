@@ -97,6 +97,9 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
+                    b.Property<int>("GameTurnId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MoveNumber")
                         .HasColumnType("int");
 
@@ -107,6 +110,8 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("id");
+
+                    b.HasIndex("GameTurnId");
 
                     b.HasIndex("GameId", "TurnNumber", "MoveNumber")
                         .IsUnique();
@@ -461,7 +466,15 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.GameTurn", "GameTurn")
+                        .WithMany("Moves")
+                        .HasForeignKey("GameTurnId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Game");
+
+                    b.Navigation("GameTurn");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
@@ -555,6 +568,11 @@ namespace BackgammonOnline.Web.Data.Migrations
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>
+                {
+                    b.Navigation("Moves");
                 });
 #pragma warning restore 612, 618
         }

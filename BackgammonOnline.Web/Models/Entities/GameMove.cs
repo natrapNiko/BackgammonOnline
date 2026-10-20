@@ -7,6 +7,7 @@ namespace BackgammonOnline.Web.Models.Entities
         [Key]
         public int id { get; set; }
         public int GameId { get; set; }
+        public int GameTurnId { get; set; }
         public int TurnNumber { get; set; }
         public int MoveNumber { get; set; }
         public int FromPoint { get; set; }
@@ -14,5 +15,6 @@ namespace BackgammonOnline.Web.Models.Entities
         public int DieValue { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public Game Game { get; set; } = null!;
+        public GameTurn GameTurn { get; set; } = null!;
     }
 }
