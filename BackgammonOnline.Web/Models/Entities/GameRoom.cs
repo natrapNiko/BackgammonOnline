@@ -23,5 +23,6 @@ namespace BackgammonOnline.Web.Models.Entities
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public ICollection<GameRoomMember> Members { get; set; } = new List<GameRoomMember>();
         public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
+        public ICollection<GameRoomInvitation> Invitations { get; set; } = new List<GameRoomInvitation>();
     }
 }

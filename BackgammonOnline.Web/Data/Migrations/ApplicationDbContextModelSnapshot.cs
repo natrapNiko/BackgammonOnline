@@ -188,6 +188,48 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.ToTable("GameRooms");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomInvitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("RespondedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameRoomId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("RecipientId", "Status");
+
+                    b.ToTable("GameRoomInvitations");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
                 {
                     b.Property<int>("Id")
@@ -528,6 +570,33 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Navigation("GameTurn");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomInvitation", b =>
+                {
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
+                        .WithMany("Invitations")
+                        .HasForeignKey("GameRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GameRoom");
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
                 {
                     b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
@@ -619,6 +688,8 @@ namespace BackgammonOnline.Web.Data.Migrations
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
                     b.Navigation("ChatMessages");
+
+                    b.Navigation("Invitations");
 
                     b.Navigation("Members");
                 });

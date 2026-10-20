@@ -18,6 +18,7 @@ namespace BackgammonOnline.Web.Data
         public DbSet<GameMove> GameMoves { get; set; } = null!;
         public DbSet<GameTurn> GameTurns { get; set; } = null!;
         public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
+        public DbSet<GameRoomInvitation> GameRoomInvitations { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -122,6 +123,31 @@ namespace BackgammonOnline.Web.Data
             //Improve performance when retrieving room chat hostory
             builder.Entity<ChatMessage>()
                 .HasIndex(m => new {m.GameRoomId, m.SendAtUtc});
+
+            //One room can have many invitations
+            builder.Entity<GameRoomInvitation>()
+                .HasOne(i => i.GameRoom)
+                .WithMany(r => r.Invitations)
+                .HasForeignKey(i => i.GameRoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //Each invitation has a registered sender
+            builder.Entity<GameRoomInvitation>()
+                .HasOne(i => i.Sender)
+                .WithMany()
+                .HasForeignKey(i => i.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Each invitation has a registered recipient
+            builder.Entity<GameRoomInvitation>()
+                .HasOne(i => i.Recipient)
+                .WithMany()
+                .HasForeignKey(i => i.RecipientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Improve performance when loading a user's invitations
+            builder.Entity<GameRoomInvitation>()
+                .HasIndex(i => new { i.RecipientId, i.Status });
         }
     }
 }
