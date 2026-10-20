@@ -24,6 +24,6 @@ namespace BackgammonOnline.Web.Models.Entities
         public IdentityUser PlayerOne { get; set; } = null!;
         public IdentityUser? PlayerTwo { get; set; }
         public IdentityUser? Winner { get; set; }
-
+        public ICollection<GameMove> Moves { get; set; } = new List<GameMove>();
     }
 }

@@ -77,6 +77,43 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.ToTable("Games");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameMove", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DieValue")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromPoint")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MoveNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToPoint")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TurnNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("GameId", "TurnNumber", "MoveNumber")
+                        .IsUnique();
+
+                    b.ToTable("GameMoves");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
                     b.Property<int>("Id")
@@ -379,6 +416,17 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Navigation("Winner");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameMove", b =>
+                {
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.Game", "Game")
+                        .WithMany("Moves")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
                 {
                     b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
@@ -447,6 +495,11 @@ namespace BackgammonOnline.Web.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
+                {
+                    b.Navigation("Moves");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>

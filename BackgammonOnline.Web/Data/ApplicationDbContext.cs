@@ -15,7 +15,7 @@ namespace BackgammonOnline.Web.Data
         public DbSet<GameRoom> GameRooms { get; set; }
         public DbSet<GameRoomMember> GameRoomMembers { get; set; }
         public DbSet<Game> Games { get; set; } = null!;
-
+        public DbSet<GameMove> GameMoves { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -60,12 +60,30 @@ namespace BackgammonOnline.Web.Data
                 .HasForeignKey(g => g.PlayerTwoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //WInner
+            //Winner
             builder.Entity<Game>()
                 .HasOne(g => g.Winner)
                 .WithMany()
                 .HasForeignKey(g => g.WinnerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //One game can contain many moves.
+            builder.Entity<GameMove>()
+                .HasOne(m => m.Game)
+                .WithMany(g => g.Moves)
+                .HasForeignKey(m => m.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //Prevent duplicate move numbers within the same turn
+            builder.Entity<GameMove>()
+                .HasIndex(m => new
+                {
+                    m.GameId,
+                    m.TurnNumber,
+                    m.MoveNumber
+                })
+                .IsUnique();
+                
         }
     }
 }
