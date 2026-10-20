@@ -19,6 +19,7 @@ namespace BackgammonOnline.Web.Data
         public DbSet<GameTurn> GameTurns { get; set; } = null!;
         public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
         public DbSet<GameRoomInvitation> GameRoomInvitations { get; set; } = null!;
+        public DbSet<GameRoomBan> GameRoomBans { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -148,6 +149,32 @@ namespace BackgammonOnline.Web.Data
             //Improve performance when loading a user's invitations
             builder.Entity<GameRoomInvitation>()
                 .HasIndex(i => new { i.RecipientId, i.Status });
+
+            //One room can contain many banned users
+            builder.Entity<GameRoomBan>()
+                .HasOne(b => b.GameRoom)
+                .WithMany(r => r.Bans)
+                .HasForeignKey(b => b.GameRoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            //Each bann references a registered banned user
+            builder.Entity<GameRoomBan>()
+                .HasOne(b => b.BannedUser)
+                .WithMany()
+                .HasForeignKey(b => b.BannedUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Each bann records the registered user who issued it
+            builder.Entity<GameRoomBan>()
+                .HasOne(b => b.BannedUser)
+                .WithMany()
+                .HasForeignKey(b => b.BannedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Prevent duplicate bans for the same user in the same room
+            builder.Entity<GameRoomBan>()
+                .HasIndex(b => new { b.GameRoomId, b.BannedUserId })
+                .IsUnique();
         }
     }
 }

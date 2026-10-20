@@ -51,7 +51,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("GameRoomId", "SendAtUtc");
 
-                    b.ToTable("ChatMessages", (string)null);
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
@@ -106,7 +106,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("WinnerId");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameMove", b =>
@@ -148,7 +148,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameId", "TurnNumber", "MoveNumber")
                         .IsUnique();
 
-                    b.ToTable("GameMoves", (string)null);
+                    b.ToTable("GameMoves");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
@@ -185,7 +185,49 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GameRooms", (string)null);
+                    b.ToTable("GameRooms");
+                });
+
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomBan", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("BannedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("BannedByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BannedByUserId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BannedUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("BannedByUserId");
+
+                    b.HasIndex("BannedByUserId1");
+
+                    b.HasIndex("GameRoomId", "BannedUserId")
+                        .IsUnique();
+
+                    b.ToTable("GameRoomBans");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomInvitation", b =>
@@ -227,7 +269,7 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("RecipientId", "Status");
 
-                    b.ToTable("GameRoomInvitations", (string)null);
+                    b.ToTable("GameRoomInvitations");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomMember", b =>
@@ -258,7 +300,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameRoomId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("GameRoomMembers", (string)null);
+                    b.ToTable("GameRoomMembers");
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>
@@ -295,7 +337,7 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.HasIndex("GameId", "TurnNumber")
                         .IsUnique();
 
-                    b.ToTable("GameTurns", (string)null);
+                    b.ToTable("GameTurns");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -570,6 +612,33 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Navigation("GameTurn");
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomBan", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedUser")
+                        .WithMany()
+                        .HasForeignKey("BannedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "BannedByUser")
+                        .WithMany()
+                        .HasForeignKey("BannedByUserId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
+                        .WithMany("Bans")
+                        .HasForeignKey("GameRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BannedByUser");
+
+                    b.Navigation("BannedUser");
+
+                    b.Navigation("GameRoom");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoomInvitation", b =>
                 {
                     b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
@@ -687,6 +756,8 @@ namespace BackgammonOnline.Web.Data.Migrations
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
+                    b.Navigation("Bans");
+
                     b.Navigation("ChatMessages");
 
                     b.Navigation("Invitations");
