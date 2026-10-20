@@ -1,4 +1,5 @@
 ﻿using BackgammonOnline.Web.Models.Enums;
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 
 namespace BackgammonOnline.Web.Models.Entities
@@ -20,6 +21,7 @@ namespace BackgammonOnline.Web.Models.Entities
         public string? PasswordHash { get; set; }
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
-        public ICollection<GameRoomMember> Members { get; set; } = new List<GameRoomMember>(); 
+        public ICollection<GameRoomMember> Members { get; set; } = new List<GameRoomMember>();
+        public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
     }
 }

@@ -22,6 +22,38 @@ namespace BackgammonOnline.Web.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SendAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("GameRoomId", "SendAtUtc");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
                 {
                     b.Property<int>("Id")
@@ -426,6 +458,25 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("GameRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GameRoom");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.Game", b =>
                 {
                     b.HasOne("BackgammonOnline.Web.Models.Entities.GameRoom", "GameRoom")
@@ -567,6 +618,8 @@ namespace BackgammonOnline.Web.Data.Migrations
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameRoom", b =>
                 {
+                    b.Navigation("ChatMessages");
+
                     b.Navigation("Members");
                 });
 

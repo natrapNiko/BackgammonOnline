@@ -17,6 +17,7 @@ namespace BackgammonOnline.Web.Data
         public DbSet<Game> Games { get; set; } = null!;
         public DbSet<GameMove> GameMoves { get; set; } = null!;
         public DbSet<GameTurn> GameTurns { get; set; } = null!;
+        public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -99,10 +100,28 @@ namespace BackgammonOnline.Web.Data
                 .HasForeignKey(t => t.GameId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
+            //Each turn number must be unique within its game
             builder.Entity<GameTurn>()
                 .HasIndex(t => new { t.GameId, t.TurnNumber })
                 .IsUnique();
+
+            //One room can contain many chat messages
+            builder.Entity<ChatMessage>()
+                .HasOne(m => m.GameRoom)
+                .WithMany(r => r.ChatMessages)
+                .HasForeignKey(m => m.GameRoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //one registered user can send many chat messages
+            builder.Entity<ChatMessage>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Improve performance when retrieving room chat hostory
+            builder.Entity<ChatMessage>()
+                .HasIndex(m => new {m.GameRoomId, m.SendAtUtc});
         }
     }
 }
