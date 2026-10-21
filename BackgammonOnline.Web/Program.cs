@@ -1,6 +1,9 @@
 using BackgammonOnline.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BackgammonOnline.Web.Services;
+using BackgammonOnline.Web.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+//add Services
+builder.Services.AddScoped<IGameRoomService, GameRoomService>();
 
 var app = builder.Build();
 
