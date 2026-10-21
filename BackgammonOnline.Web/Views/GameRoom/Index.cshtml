@@ -36,6 +36,7 @@
                         <th>Variant</th>
                         <th>Status</th>
                         <th>Created</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
@@ -47,6 +48,16 @@
                             <td>@room.Variant</td>
                             <td>@room.Status</td>
                             <td>@room.CreatedAtUtc.ToString("dd/MM/yyyy HH:mm")</td>
+
+                            <td>
+                            <a asp-controller="GameRoom"
+                            asp-action="Details"
+                            asp-route-id="@room.Id"
+                            class="btn btn-sm btn-primary">
+                            Details
+                            </a>
+                            </td>
+                        
                         </tr>
                     }
                 </tbody>

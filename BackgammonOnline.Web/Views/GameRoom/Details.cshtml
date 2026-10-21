@@ -1,0 +1,48 @@
+﻿@model BackgammonOnline.Web.ViewModels.RoomDetailsViewModel
+
+@{
+    ViewData["Title"] = "Room Details";
+}
+
+<div class="container mt-4">
+
+    <h1 class="mb-4">@Model.Name</h1>
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+                <h5 class="mb-0">Room Information</h5>
+            </div>
+
+            <div class="card-body">
+
+                <dl class="row">
+
+                    <dt class="col-sm-4">Game Variant</dt>
+                    <dd class="col-sm-8"@Model.Variant></dd>
+
+                    <dt class="col-sm-4">Room Status</dt>
+                    <dd class="col-sm-8">@Model.Status</dd>
+
+                    <dt class="col-sm-4">Player</dt>
+                    <dd class="col-sm-8">@Model.PlayerCount / 2</dd>
+
+                    <dt class="col-sm-4">Room Status</dt>
+                    <dd class="col-sm-8">@Model.SpectatorCount / 10</dd>
+
+                    <dt class="col-sm-4">Created</dt>
+                    <dd class="col-sm-8">@Model.CreateAtUtc.ToString("dd/MM/yyyy HH:mm") UTC</dd>
+
+                </dl>
+
+                <a asp-controller="GameRoom" 
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Lobby
+               </a>
+
+            </div>
+
+
+        </div>
+</div>

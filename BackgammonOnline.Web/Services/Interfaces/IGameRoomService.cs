@@ -11,5 +11,7 @@ namespace BackgammonOnline.Web.Services.Interfaces
         Task<GameRoom> CreateRoomAsync(
             CreateGameRoomViewModel model,
             string ownerId);
+        Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId);
         }
 }
+ 

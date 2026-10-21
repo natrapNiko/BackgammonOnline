@@ -95,7 +95,27 @@ namespace BackgammonOnline.Web.Services
             return room;
         }
 
+        public async Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId)
+        {
+            return await _context.GameRooms
+                .AsNoTracking()
+                .Where(r => r.Id == roomId && !r.IsPrivate)
+                .Select(r => new RoomDetailsViewModel
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Variant = r.Variant,
+                    Status = r.Status,
+                    CreateAtUtc = r.CreatedAtUtc,
 
+                    PlayerCount = r.Members.Count(
+                        m => m.Role == RoomMemberRole.Player),
+
+                    SpectatorCount = r.Members.Count(
+                        m => m.Role == RoomMemberRole.Spectator)
+                })
+                .FirstOrDefaultAsync();
+        }
 
         public async Task<List<GameRoom>> GetPublicRoomsAsync()
         {

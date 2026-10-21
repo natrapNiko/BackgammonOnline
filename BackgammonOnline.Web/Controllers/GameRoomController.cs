@@ -61,5 +61,19 @@ namespace BackgammonOnline.Web.Controllers
                 "Form validated successfully. Room creation will be implemented next.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var room = await _gameRoomService
+                .GetPublicRoomDetailsAsync(id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            return View(room);
+        }
     }
 }
