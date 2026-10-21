@@ -13,6 +13,7 @@ namespace BackgammonOnline.Web.Models.Entities
         [Required]
         public string UserId { get; set; } = string.Empty;
         public RoomMemberRole Role { get; set; }
+        public int? PlayerPosition { get; set; }
         public DateTime JoinedAtUtc { get; set; } = DateTime.UtcNow;
         
         //Navigation property to the game room

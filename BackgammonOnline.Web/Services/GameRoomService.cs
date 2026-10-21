@@ -85,6 +85,7 @@ namespace BackgammonOnline.Web.Services
             {
                 UserId = ownerId,
                 Role = RoomMemberRole.Player,
+                PlayerPosition = 1,
                 JoinedAtUtc = DateTime.UtcNow
             });
 
@@ -131,6 +132,76 @@ namespace BackgammonOnline.Web.Services
             return await _context.GameRooms
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == roomId);
+        }
+
+        public async Task<bool> JoinPublicRoomAsPlayerAsync(int roomId, string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId)) 
+            {
+                return false;
+            }
+
+            var room = await _context.GameRooms
+                .Include(r => r.Members)
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if(room == null || room.IsPrivate || room.Status != RoomStatus.Waiting)
+            {
+                return false;
+            }
+
+            bool isAlreadyMember = room.Members
+                .Any(m => m.UserId == userId);
+
+            if (isAlreadyMember) 
+            {
+                return false;
+            }
+
+            bool isBanned = await _context.GameRoomBans
+                .AnyAsync(b => b.GameRoomId == roomId && b.BannedUserId == userId);
+
+            if (isBanned)
+            {
+                return false;
+            }
+
+            int playerCount = room.Members
+                .Count(m => m.Role == RoomMemberRole.Player);
+
+            if (playerCount >= 2)
+            {
+                return false;
+            }
+
+            bool secondPositionTaken = room.Members
+                .Any(m => m.PlayerPosition == 2);
+
+            if (secondPositionTaken)
+            {
+                return false;
+            }
+
+            _context.GameRoomMembers.Add(new GameRoomMember
+            {
+                GameRoomId = roomId,
+                UserId = userId,
+                Role = RoomMemberRole.Player,
+                PlayerPosition = 2,
+                JoinedAtUtc = DateTime.UtcNow
+            });
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                // A competing request may have filled the last player slot.
+                // Other database failures will be handled more precisely later.
+                return false;
+            }
         }
 
         public async Task<bool> RoomExistsAsync(int roomId)

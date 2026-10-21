@@ -12,6 +12,9 @@ namespace BackgammonOnline.Web.Services.Interfaces
             CreateGameRoomViewModel model,
             string ownerId);
         Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId);
+        Task<bool> JoinPublicRoomAsPlayerAsync(
+            int roomId,
+            string userId);
         }
 }
  

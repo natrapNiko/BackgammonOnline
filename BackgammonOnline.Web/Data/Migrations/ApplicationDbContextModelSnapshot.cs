@@ -282,6 +282,9 @@ namespace BackgammonOnline.Web.Data.Migrations
                     b.Property<DateTime>("JoinedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("PlayerPosition")
+                        .HasColumnType("int");
+
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
@@ -293,10 +296,17 @@ namespace BackgammonOnline.Web.Data.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("GameRoomId", "PlayerPosition")
+                        .IsUnique()
+                        .HasFilter("[PlayerPosition] IS NOT NULL");
+
                     b.HasIndex("GameRoomId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("GameRoomMembers");
+                    b.ToTable("GameRoomMembers", t =>
+                        {
+                            t.HasCheckConstraint("CK_GameRoomMembers_PlayerPosition", "[PlayerPosition] IS NULL OR [PlayerPosition] IN (1, 2)");
+                        });
                 });
 
             modelBuilder.Entity("BackgammonOnline.Web.Models.Entities.GameTurn", b =>

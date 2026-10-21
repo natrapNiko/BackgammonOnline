@@ -189,6 +189,18 @@ namespace BackgammonOnline.Web.Data
             builder.Entity<PlayerStatistic>()
                 .HasIndex(s => new { s.UserId, s.Variant })
                 .IsUnique();
+
+            //Each room has at most one member in each player position
+            builder.Entity<GameRoomMember>()
+                .HasIndex(m => new { m.GameRoomId, m.PlayerPosition })
+                .IsUnique()
+                .HasFilter("[PlayerPosition] IS NOT NULL");
+
+            //Valid player positions are 1 and 2
+            builder.Entity<GameRoomMember>()
+                .ToTable(t => t.HasCheckConstraint(
+                    "CK_GameRoomMembers_PlayerPosition",
+                    "[PlayerPosition] IS NULL OR [PlayerPosition] IN (1, 2)"));
         }
     }
 }
