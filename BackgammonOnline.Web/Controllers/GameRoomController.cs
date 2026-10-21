@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using BackgammonOnline.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BackgammonOnline.Web.Controllers
 {
@@ -30,10 +32,28 @@ namespace BackgammonOnline.Web.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CreateGameRoomViewModel model) 
+        public async Task<IActionResult> Create(CreateGameRoomViewModel model) 
         { 
             if(!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            string? ownerId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(ownerId)) 
+            {
+                return Challenge();
+            }
+
+            try
+            {
+                await _gameRoomService.CreateRoomAsync(model, ownerId);
+            }
+            catch (System.ComponentModel.DataAnnotations.ValidationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(model);
             }
 

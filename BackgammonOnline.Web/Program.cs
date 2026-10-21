@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using BackgammonOnline.Web.Services;
 using BackgammonOnline.Web.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using BackgammonOnline.Web.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddControllersWithViews();
 
 //add Services
 builder.Services.AddScoped<IGameRoomService, GameRoomService>();
+builder.Services.AddScoped<IPasswordHasher<GameRoom>, PasswordHasher<GameRoom>>();
 
 var app = builder.Build();
 

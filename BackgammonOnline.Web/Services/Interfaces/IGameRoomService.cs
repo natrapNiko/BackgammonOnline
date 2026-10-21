@@ -1,4 +1,5 @@
 ﻿using BackgammonOnline.Web.Models.Entities;
+using BackgammonOnline.Web.ViewModels;
 
 namespace BackgammonOnline.Web.Services.Interfaces
 {
@@ -7,5 +8,8 @@ namespace BackgammonOnline.Web.Services.Interfaces
             Task<GameRoom?> GetRoomByIdAsync(int roomId);
             Task<List<GameRoom>> GetPublicRoomsAsync();
             Task<bool> RoomExistsAsync(int roomId);
+        Task<GameRoom> CreateRoomAsync(
+            CreateGameRoomViewModel model,
+            string ownerId);
         }
 }
