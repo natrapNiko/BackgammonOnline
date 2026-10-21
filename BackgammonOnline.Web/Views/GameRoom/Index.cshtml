@@ -1,0 +1,51 @@
+﻿@model List<BackgammonOnline.Web.Models.Entities.GameRoom>
+
+@{
+    ViewData["Title"] = "Game Lobby";
+}
+
+<div class="container mt-4">
+
+    <h1 class"mb-3">Game Lobby</h1>
+
+    <p class="text-muted">
+        Browse public Backgamoon rooms.
+    </p>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No public game rooms are available yet.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Room Name</th>
+                        <th>Variant</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var room in Model)
+                    {
+                        <tr>
+                            <td>@room.Name</td>
+                            <td>@room.Variant</td>
+                            <td>@room.Status</td>
+                            <td>@room.CreatedAtUtc.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+
+</div>
