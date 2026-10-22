@@ -8,6 +8,20 @@
 
     <h1 class="mb-4">@Model.Name</h1>
 
+    @if(TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success">
+            @successMessage
+        </div>
+    }
+
+    @if(TempData["ErrorMessage"] is string errorMEssage)
+    {
+        <div class="alert alert-danger">
+            @errorMEssage
+        </div>
+    }
+
         <div class="card shadow-sm">
 
             <div class="card-header">
@@ -40,6 +54,16 @@
                    class="btn btn-secondary">
                     Back to Lobby
                </a>
+
+               @if (User.Identity?.IsAuthenticated == true && Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.Waiting && Model.PlayerCount < 2)
+               {
+                    <form asp-controller="GameRoom" asp-action="JoinAsPlayer" asp-route-id="@Model.Id" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success">
+                            Join as Player
+                        </button>
+                    </form>
+               }
 
             </div>
 

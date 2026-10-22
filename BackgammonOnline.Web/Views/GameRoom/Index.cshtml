@@ -12,6 +12,22 @@
         Browse public Backgamoon rooms.
     </p>
 
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-controller="GameRoom" asp-action="Create" class="btn btn-success mb-4">
+            Create Game Room
+        </a>
+    }
+    else
+    {
+        <p>
+            <a asp-area="Identity" asp-page="/Account/Login">
+                Sign in
+            </a>
+            to create a game room.
+        </p>
+    }
+
     @if (TempData["SucessMessage"] is string successMessage)
     {
         <div class="alert alert-success">

@@ -75,5 +75,33 @@ namespace BackgammonOnline.Web.Controllers
 
             return View(room);
         }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> JoinAsPlayer(int id)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if(string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            bool joined = await _gameRoomService
+                .JoinPublicRoomAsPlayerAsync(id, userId);
+
+            if(!joined)
+            {
+                TempData["ErrorMessage"] = "Unable to join this room. It may be full or unavailable.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "You joined the room as a player.";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
     }
 }
