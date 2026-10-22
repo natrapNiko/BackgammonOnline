@@ -198,8 +198,93 @@ namespace BackgammonOnline.Web.Services
             }
             catch (DbUpdateException)
             {
-                // A competing request may have filled the last player slot.
-                // Other database failures will be handled more precisely later.
+                //A competing request may have filled the last player slot.
+                //Other database failures will be handled more precisely later.
+                return false;
+            }
+        }
+
+        public async Task<bool> JoinPublicRoomAsSpectatorAsync(int roomId, string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId)) 
+            {
+                return false;
+            }
+
+            var room = await _context.GameRooms
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room == null || room.IsPrivate || (room.Status != RoomStatus.Waiting && room.Status != RoomStatus.InProgress))
+            {
+                return false;
+            }
+
+            bool alreadyMember = await _context.GameRoomMembers
+                .AnyAsync(m => m.GameRoomId == roomId && m.UserId == userId);
+
+            if (alreadyMember)
+            {
+                return false;
+            }
+
+            bool isBanned = await _context.GameRoomBans
+                .AnyAsync(b => b.GameRoomId == roomId && b.BannedByUserId == userId);
+
+            if (isBanned)
+            {
+                return false;
+            }
+
+            //A transaction serialises membership changes for this room
+            await using var transaction = await _context.Database
+                .BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            try
+            {
+                //Recheck membership while holding the transaction
+                if (await _context.GameRoomMembers.AnyAsync( m => m.GameRoomId == roomId && m.UserId == userId))
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                //Recheck the room status and ban within the transaction
+                bool roomAvailable = await _context.GameRooms.AnyAsync(r => r.Id == roomId && !r.IsPrivate && (r.Status == RoomStatus.Waiting || r.Status == RoomStatus.InProgress));
+
+                bool bannned = await _context.GameRoomBans.AnyAsync(b => b.GameRoomId == roomId && b.BannedByUserId == userId);
+
+                if(!roomAvailable || bannned) 
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                int spectatorCount = await _context.GameRoomMembers.CountAsync(m => m.GameRoomId == roomId && m.Role == RoomMemberRole.Spectator);
+
+                if(spectatorCount >= 10) 
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                _context.GameRoomMembers.Add(new GameRoomMember 
+                {
+                    GameRoomId = roomId,
+                    UserId = userId,
+                    Role = RoomMemberRole.Spectator,
+                    PlayerPosition = null,
+                    JoinedAtUtc = DateTime.UtcNow
+                });
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch(DbUpdateException)
+            {
+                await transaction.RollbackAsync();
                 return false;
             }
         }

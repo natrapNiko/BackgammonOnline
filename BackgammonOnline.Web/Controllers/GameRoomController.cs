@@ -103,5 +103,31 @@ namespace BackgammonOnline.Web.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> JoinAsSpectator(int id)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if(string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            bool joined = await _gameRoomService.JoinPublicRoomAsSpectatorAsync(id, userId);
+
+            if(joined)
+            {
+                TempData["SuccessMessage"] = "You joined the room as a spectator";
+            }
+            else 
+            {
+                TempData["ErrorMessage"] = "Unable to join as a spectator. The room may be full or unavailable.";
+            }
+
+            return RedirectToAction(nameof(Details), new {id});
+        }
+
     }
 }

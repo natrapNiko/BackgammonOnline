@@ -65,6 +65,18 @@
                     </form>
                }
 
+               @if (User.Identity?.IsAuthenticated == true &&(Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.Waiting || Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.InProgress) && Model.SpectatorCount < 10)
+               {
+                    <form asp-controller="GameRoom" asp-action="JoinAsSpectator" asp-route-id="@Model.Id" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit" class="btn btn-info">
+                            Join as Spectator
+                        </button>
+
+                    </form> 
+               }
+
             </div>
 
 
