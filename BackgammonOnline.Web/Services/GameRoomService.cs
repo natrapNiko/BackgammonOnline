@@ -96,7 +96,7 @@ namespace BackgammonOnline.Web.Services
             return room;
         }
 
-        public async Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId)
+        public async Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId, string? currentUserId)
         {
             return await _context.GameRooms
                 .AsNoTracking()
@@ -113,7 +113,13 @@ namespace BackgammonOnline.Web.Services
                         m => m.Role == RoomMemberRole.Player),
 
                     SpectatorCount = r.Members.Count(
-                        m => m.Role == RoomMemberRole.Spectator)
+                        m => m.Role == RoomMemberRole.Spectator),
+
+                    IsCurrentUserSpectator =
+                        currentUserId != null &&
+                        r.Members.Any(m =>
+                        m.UserId == currentUserId &&
+                        m.Role == RoomMemberRole.Spectator)
                 })
                 .FirstOrDefaultAsync();
         }
@@ -287,6 +293,30 @@ namespace BackgammonOnline.Web.Services
                 await transaction.RollbackAsync();
                 return false;
             }
+        }
+
+        public async Task<bool> LeaveRoomAsSpectatorAsync(int roomId, string userId)
+        {
+            if(roomId <= 0 || string.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            var membership = await _context.GameRoomMembers.FirstOrDefaultAsync(
+                m => m.GameRoomId == roomId &&
+                m.UserId == userId &&
+                m.Role == RoomMemberRole.Spectator);
+
+            if (membership == null) 
+            {
+                return false;
+            }
+
+            _context.GameRoomMembers.Remove(membership);
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> RoomExistsAsync(int roomId)

@@ -11,5 +11,6 @@ namespace BackgammonOnline.Web.ViewModels
         public DateTime CreateAtUtc { get; set; }
         public int PlayerCount { get; set; }
         public int SpectatorCount { get; set; }
+        public bool IsCurrentUserSpectator { get; set; }
     }
 }

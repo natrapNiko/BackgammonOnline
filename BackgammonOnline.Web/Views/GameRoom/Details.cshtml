@@ -1,84 +1,149 @@
 ﻿@model BackgammonOnline.Web.ViewModels.RoomDetailsViewModel
 
+@using BackgammonOnline.Web.Models.Enums
+
 @{
     ViewData["Title"] = "Room Details";
+
+    bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    bool isWaiting = Model.Status == RoomStatus.Waiting;
+
+    bool isInProgress = Model.Status == RoomStatus.InProgress;
+
+    bool canJoinAsPlayer = isAuthenticated
+        && isWaiting
+        && Model.PlayerCount < 2
+        && !Model.IsCurrentUserSpectator;
+
+    bool canJoinAsSpectator = isAuthenticated
+        && (isWaiting || isInProgress)
+        && Model.SpectatorCount < 10
+        && !Model.IsCurrentUserSpectator;
 }
 
 <div class="container mt-4">
 
     <h1 class="mb-4">@Model.Name</h1>
 
-    @if(TempData["SuccessMessage"] is string successMessage)
+    <!-- Success message -->
+    @if (TempData["SuccessMessage"] is string successMessage)
     {
         <div class="alert alert-success">
             @successMessage
         </div>
     }
 
-    @if(TempData["ErrorMessage"] is string errorMEssage)
+    <!-- Error message -->
+    @if (TempData["ErrorMessage"] is string errorMessage)
     {
         <div class="alert alert-danger">
-            @errorMEssage
+            @errorMessage
         </div>
     }
 
-        <div class="card shadow-sm">
+    <div class="card shadow-sm">
 
-            <div class="card-header">
-                <h5 class="mb-0">Room Information</h5>
-            </div>
+        <div class="card-header">
+            <h5 class="mb-0">Room Information</h5>
+        </div>
 
-            <div class="card-body">
+        <div class="card-body">
 
-                <dl class="row">
+            <dl class="row">
 
-                    <dt class="col-sm-4">Game Variant</dt>
-                    <dd class="col-sm-8"@Model.Variant></dd>
+                <dt class="col-sm-4">Game Variant</dt>
+                <dd class="col-sm-8">@Model.Variant</dd>
 
-                    <dt class="col-sm-4">Room Status</dt>
-                    <dd class="col-sm-8">@Model.Status</dd>
+                <dt class="col-sm-4">Room Status</dt>
+                <dd class="col-sm-8">@Model.Status</dd>
 
-                    <dt class="col-sm-4">Player</dt>
-                    <dd class="col-sm-8">@Model.PlayerCount / 2</dd>
+                <dt class="col-sm-4">Players</dt>
+                <dd class="col-sm-8">
+                    @Model.PlayerCount / 2
+                </dd>
 
-                    <dt class="col-sm-4">Room Status</dt>
-                    <dd class="col-sm-8">@Model.SpectatorCount / 10</dd>
+                <dt class="col-sm-4">Spectators</dt>
+                <dd class="col-sm-8">
+                    @Model.SpectatorCount / 10
+                </dd>
 
-                    <dt class="col-sm-4">Created</dt>
-                    <dd class="col-sm-8">@Model.CreateAtUtc.ToString("dd/MM/yyyy HH:mm") UTC</dd>
+                <dt class="col-sm-4">Created</dt>
+                <dd class="col-sm-8">
+                    @Model.CreateAtUtc.ToString("dd/MM/yyyy HH:mm") UTC
+                </dd>
 
-                </dl>
+            </dl>
 
-                <a asp-controller="GameRoom" 
-                   asp-action="Index"
-                   class="btn btn-secondary">
-                    Back to Lobby
-               </a>
+            <hr />
 
-               @if (User.Identity?.IsAuthenticated == true && Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.Waiting && Model.PlayerCount < 2)
-               {
-                    <form asp-controller="GameRoom" asp-action="JoinAsPlayer" asp-route-id="@Model.Id" method="post" class="mb-3">
+            <!-- Room actions -->
+            <div class="d-flex flex-wrap gap-2">
+
+                <!-- Join as Player -->
+                @if (canJoinAsPlayer)
+                {
+                    <form asp-controller="GameRoom"
+                          asp-action="JoinAsPlayer"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-success">
+
+                        <button type="submit"
+                                class="btn btn-success">
                             Join as Player
                         </button>
-                    </form>
-               }
 
-               @if (User.Identity?.IsAuthenticated == true &&(Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.Waiting || Model.Status == BackgammonOnline.Web.Models.Enums.RoomStatus.InProgress) && Model.SpectatorCount < 10)
-               {
-                    <form asp-controller="GameRoom" asp-action="JoinAsSpectator" asp-route-id="@Model.Id" method="post" class="mb-3">
+                    </form>
+                }
+
+                <!-- Leave as Spectator -->
+                @if (Model.IsCurrentUserSpectator)
+                {
+                    <form asp-controller="GameRoom"
+                          asp-action="LeaveAsSpectator"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
                         @Html.AntiForgeryToken()
 
-                        <button type="submit" class="btn btn-info">
+                        <button type="submit"
+                                class="btn btn-warning">
+                            Leave as Spectator
+                        </button>
+
+                    </form>
+                }
+                else if (canJoinAsSpectator)
+                {
+                    <!-- Join as Spectator -->
+                    <form asp-controller="GameRoom"
+                          asp-action="JoinAsSpectator"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-info">
                             Join as Spectator
                         </button>
 
-                    </form> 
-               }
+                    </form>
+                }
+
+                <!-- Back to Lobby -->
+                <a asp-controller="GameRoom"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Lobby
+                </a>
 
             </div>
 
-
         </div>
+
+    </div>
+
 </div>

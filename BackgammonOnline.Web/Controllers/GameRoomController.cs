@@ -65,8 +65,11 @@ namespace BackgammonOnline.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
+            string? userId = User.FindFirstValue
+                (ClaimTypes.NameIdentifier);
+
             var room = await _gameRoomService
-                .GetPublicRoomDetailsAsync(id);
+                .GetPublicRoomDetailsAsync(id, userId);
 
             if (room == null)
             {
@@ -127,6 +130,36 @@ namespace BackgammonOnline.Web.Controllers
             }
 
             return RedirectToAction(nameof(Details), new {id});
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LeaveAsSpectator(int id)
+        {
+            string? userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            bool left = await _gameRoomService
+                .LeaveRoomAsSpectatorAsync(id, userId);
+
+            if (left)
+            {
+                TempData["SuccessMessage"] =
+                    "You have left the room as a spectator.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] =
+                    "You are not a spectator in this room.";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
     }

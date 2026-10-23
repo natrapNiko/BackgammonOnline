@@ -9,9 +9,11 @@ namespace BackgammonOnline.Web.Services.Interfaces
             Task<List<GameRoom>> GetPublicRoomsAsync();
             Task<bool> RoomExistsAsync(int roomId);
             Task<GameRoom> CreateRoomAsync(CreateGameRoomViewModel model, string ownerId);
-            Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId);
+            Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId, string? currentUserId);
             Task<bool> JoinPublicRoomAsPlayerAsync(int roomId, string userId);
             Task<bool> JoinPublicRoomAsSpectatorAsync(int roomId, string userId);
+            Task<bool> LeaveRoomAsSpectatorAsync(int roomId, string userId);
+
         }
 }
  
