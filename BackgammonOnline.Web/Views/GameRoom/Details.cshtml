@@ -11,15 +11,21 @@
 
     bool isInProgress = Model.Status == RoomStatus.InProgress;
 
-    bool canJoinAsPlayer = isAuthenticated
-        && isWaiting
-        && Model.PlayerCount < 2
-        && !Model.IsCurrentUserSpectator;
+    bool isAlreadyMember =
+        Model.IsCurrentUserPlayer ||
+        Model.IsCurrentUserSpectator;
 
-    bool canJoinAsSpectator = isAuthenticated
-        && (isWaiting || isInProgress)
-        && Model.SpectatorCount < 10
-        && !Model.IsCurrentUserSpectator;
+    bool canJoinAsPlayer =
+        isAuthenticated &&
+        !isAlreadyMember &&
+        isWaiting &&
+        Model.PlayerCount < 2;
+
+    bool canJoinAsSpectator =
+        isAuthenticated &&
+        !isAlreadyMember &&
+        (isWaiting || isInProgress) &&
+        Model.SpectatorCount < 10;
 }
 
 <div class="container mt-4">
@@ -76,6 +82,25 @@
             </dl>
 
             <hr />
+
+            @if (Model.IsCurrentUserOwner)
+            {
+                <div class="alert alert-primary">
+                    You are the owner of this room.
+                </div>
+            }
+            else if (Model.IsCurrentUserPlayer)
+            {
+                <div class="alert alert-success">
+                    You are a player in this room.
+                </div>
+            }
+            else if (Model.IsCurrentUserSpectator)
+            {
+                <div class="alert alert-info">
+                    You are watching this room as a spectator.
+                </div>
+            }
 
             <!-- Room actions -->
             <div class="d-flex flex-wrap gap-2">

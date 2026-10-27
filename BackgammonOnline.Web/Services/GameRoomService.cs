@@ -96,7 +96,9 @@ namespace BackgammonOnline.Web.Services
             return room;
         }
 
-        public async Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId, string? currentUserId)
+        public async Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(
+    int roomId,
+    string? currentUserId)
         {
             return await _context.GameRooms
                 .AsNoTracking()
@@ -118,8 +120,18 @@ namespace BackgammonOnline.Web.Services
                     IsCurrentUserSpectator =
                         currentUserId != null &&
                         r.Members.Any(m =>
-                        m.UserId == currentUserId &&
-                        m.Role == RoomMemberRole.Spectator)
+                            m.UserId == currentUserId &&
+                            m.Role == RoomMemberRole.Spectator),
+
+                    IsCurrentUserPlayer =
+                        currentUserId != null &&
+                        r.Members.Any(m =>
+                            m.UserId == currentUserId &&
+                            m.Role == RoomMemberRole.Player),
+
+                    IsCurrentUserOwner =
+                        currentUserId != null &&
+                        r.OwnerId == currentUserId
                 })
                 .FirstOrDefaultAsync();
         }

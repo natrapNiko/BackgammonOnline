@@ -12,5 +12,7 @@ namespace BackgammonOnline.Web.ViewModels
         public int PlayerCount { get; set; }
         public int SpectatorCount { get; set; }
         public bool IsCurrentUserSpectator { get; set; }
+        public bool IsCurrentUserPlayer { get; set; }
+        public bool IsCurrentUserOwner { get; set; }
     }
 }
