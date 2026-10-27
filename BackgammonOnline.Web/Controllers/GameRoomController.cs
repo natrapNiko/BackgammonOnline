@@ -1,7 +1,8 @@
-﻿using BackgammonOnline.Web.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using BackgammonOnline.Web.Models.Enums;
+using BackgammonOnline.Web.Services.Interfaces;
 using BackgammonOnline.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -16,9 +17,27 @@ namespace BackgammonOnline.Web.Controllers
             _gameRoomService = gameRoomService;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(RoomStatus? status)
         {
-            var rooms = await _gameRoomService.GetPublicRoomsAsync();
+            //Check whether MVC successfully converted the URL parameter.
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid room status.");
+            }
+
+            //Check whether the value exists in the RoomStatus enum.
+            if (status.HasValue &&
+                !Enum.IsDefined(typeof(RoomStatus), status.Value))
+            {
+                return BadRequest("Invalid room status.");
+            }
+
+            var rooms = await _gameRoomService
+                .GetPublicRoomsAsync(status);
+
+            ViewBag.SelectedStatus = status;
+
             return View(rooms);
         }
 

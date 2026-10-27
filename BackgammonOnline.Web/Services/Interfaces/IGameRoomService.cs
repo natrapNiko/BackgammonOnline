@@ -1,4 +1,5 @@
 ﻿using BackgammonOnline.Web.Models.Entities;
+using BackgammonOnline.Web.Models.Enums;
 using BackgammonOnline.Web.ViewModels;
 
 namespace BackgammonOnline.Web.Services.Interfaces
@@ -6,7 +7,7 @@ namespace BackgammonOnline.Web.Services.Interfaces
         public interface IGameRoomService
         {
             Task<GameRoom?> GetRoomByIdAsync(int roomId);
-            Task<List<GameRoom>> GetPublicRoomsAsync();
+            Task<List<GameRoom>> GetPublicRoomsAsync(RoomStatus? status = null);
             Task<bool> RoomExistsAsync(int roomId);
             Task<GameRoom> CreateRoomAsync(CreateGameRoomViewModel model, string ownerId);
             Task<RoomDetailsViewModel?> GetPublicRoomDetailsAsync(int roomId, string? currentUserId);

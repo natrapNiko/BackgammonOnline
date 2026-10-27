@@ -153,11 +153,18 @@ namespace BackgammonOnline.Web.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<GameRoom>> GetPublicRoomsAsync()
+        public async Task<List<GameRoom>> GetPublicRoomsAsync(RoomStatus? status = null)
         {
-            return await _context.GameRooms
+            var query = _context.GameRooms
                 .AsNoTracking()
-                .Where(r => !r.IsPrivate)
+                .Where(r => !r.IsPrivate);
+
+            if (status.HasValue)
+            {
+                query = query.Where(r => r.Status == status.Value);
+            }
+
+            return await query
                 .OrderByDescending(r => r.CreatedAtUtc)
                 .ToListAsync();
         }
