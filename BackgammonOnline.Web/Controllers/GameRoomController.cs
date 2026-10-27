@@ -191,5 +191,36 @@ namespace BackgammonOnline.Web.Controllers
 
             return RedirectToAction(nameof(Details), new { id });
         }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Close(int id)
+        {
+            string? ownerId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(ownerId))
+            {
+                return Challenge();
+            }
+
+            bool closed = await _gameRoomService.CloseRoomAsync(
+                id,
+                ownerId);
+
+            if (closed)
+            {
+                TempData["SuccessMessage"] =
+                    "Game room closed successfully.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["ErrorMessage"] =
+                "Unable to close this room. You may not be the owner, or the room is no longer waiting.";
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

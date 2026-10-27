@@ -22,6 +22,23 @@ namespace BackgammonOnline.Web.Services
             _passwordHasher = passwordHasher;
         }
 
+        public async Task<bool> CloseRoomAsync(int roomId, string ownerId)
+        {
+            if(roomId <= 0 || string.IsNullOrWhiteSpace(ownerId))
+            {
+                return false;
+            }
+
+            int updatedRows = await _context.GameRooms.Where(r =>
+                r.Id == roomId &&
+                r.OwnerId == ownerId &&
+                r.Status == RoomStatus.Waiting)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(
+                    r => r.Status, RoomStatus.Closed));
+
+            return updatedRows == 1;
+        }
+
         public async Task<GameRoom> CreateRoomAsync(
             CreateGameRoomViewModel model,
             string ownerId)

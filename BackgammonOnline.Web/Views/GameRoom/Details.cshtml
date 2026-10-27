@@ -31,6 +31,10 @@
         Model.IsCurrentUserPlayer &&
         !Model.IsCurrentUserOwner &&
         Model.Status == RoomStatus.Waiting;
+
+    bool canCloseRoom =
+        Model.IsCurrentUserOwner &&
+        Model.Status == RoomStatus.Waiting;
 }
 
 <div class="container mt-4">
@@ -176,6 +180,24 @@
                         <button type="submit"
                                 class="btn btn-info">
                             Join as Spectator
+                        </button>
+
+                    </form>
+                }
+
+                @if (canCloseRoom)
+                {
+                    <form asp-controller="GameRoom"
+                          asp-action="Close"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to close this room?');">
+                            Close Room
                         </button>
 
                     </form>
