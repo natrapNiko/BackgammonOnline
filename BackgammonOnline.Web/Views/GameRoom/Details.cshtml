@@ -26,6 +26,11 @@
         !isAlreadyMember &&
         (isWaiting || isInProgress) &&
         Model.SpectatorCount < 10;
+
+    bool canLeaveAsPlayer =
+        Model.IsCurrentUserPlayer &&
+        !Model.IsCurrentUserOwner &&
+        Model.Status == RoomStatus.Waiting;
 }
 
 <div class="container mt-4">
@@ -118,6 +123,24 @@
                         <button type="submit"
                                 class="btn btn-success">
                             Join as Player
+                        </button>
+
+                    </form>
+                }
+
+                <!-- Leave as Player -->
+                @if (canLeaveAsPlayer)
+                {
+                    <form asp-controller="GameRoom"
+                          asp-action="LeaveAsPlayer"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-warning">
+                            Leave Room
                         </button>
 
                     </form>

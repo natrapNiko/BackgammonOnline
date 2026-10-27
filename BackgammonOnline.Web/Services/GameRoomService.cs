@@ -307,6 +307,45 @@ namespace BackgammonOnline.Web.Services
             }
         }
 
+        public async Task<bool> LeaveRoomAsPlayerAsync(int roomId, string userId)
+        {
+            if (roomId <= 0 || string.IsNullOrWhiteSpace(userId))
+            {
+                return false;
+            }
+
+            var room = await _context.GameRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room == null || room.Status != RoomStatus.Waiting) 
+            {
+                return false;
+            }
+
+            //The room owner musr use the Close Room func´tionality
+            if(room.OwnerId == userId)
+            {
+                return false;
+            }
+
+            var membership = await _context.GameRoomMembers.FirstOrDefaultAsync(m =>
+            m.GameRoomId == roomId &&
+            m.UserId == userId &&
+            m.Role == RoomMemberRole.Player &&
+            m.PlayerPosition == 2);
+
+            if (membership == null)
+            {
+                return false;
+            }
+
+            _context.GameRoomMembers.Remove(membership);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+
+        }
+
         public async Task<bool> LeaveRoomAsSpectatorAsync(int roomId, string userId)
         {
             if(roomId <= 0 || string.IsNullOrWhiteSpace(userId))

@@ -162,5 +162,34 @@ namespace BackgammonOnline.Web.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LeaveAsPlayer(int id)
+        {
+            string? userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            bool left = await _gameRoomService
+                .LeaveRoomAsPlayerAsync(id, userId);
+
+            if (left)
+            {
+                TempData["SuccessMessage"] =
+                    "You have left the room as a player.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] =
+                    "You cannot leave this room as a player.";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }
